@@ -1,0 +1,312 @@
+<CompuCell3D Revision="20260214" Version="4.8.0">
+   
+<Metadata>
+      
+      <!-- Basic properties simulation -->
+<NumberOfProcessors>1</NumberOfProcessors>
+<DebugOutputFrequency>10</DebugOutputFrequency>
+<!-- <NonParallelModule Name="Potts"/> -->
+<MCSConversionFactor DisplayName="minute" Units="min">1.0</MCSConversionFactor>
+<VoxelConversionFactor DisplayName="micrometer" Units="um">1.0</VoxelConversionFactor>
+</Metadata>
+   
+<Potts>
+
+<!-- Basic properties of CPM (GGH) algorithm -->
+<Dimensions x="400" y="100" z="1"/>
+<Steps>100000</Steps>
+<Temperature>10.0</Temperature>
+<NeighborOrder>1</NeighborOrder>
+
+<FluctuationAmplitude>
+<FluctuationAmplitudeParameters CellType="EPI"   FluctuationAmplitude="3"/>
+<FluctuationAmplitudeParameters CellType="HYB"   FluctuationAmplitude="6"/>
+<FluctuationAmplitudeParameters CellType="MESEN" FluctuationAmplitude="8"/>
+<FluctuationAmplitudeParameters CellType="TCELL" FluctuationAmplitude="6"/>  
+
+<!-- higher = faster random movement -->
+</FluctuationAmplitude>
+</Potts>
+
+
+
+
+
+
+
+<Plugin Name="CellType">
+
+<!-- Listing all cell types in the simulation -->
+<CellType TypeId="0" TypeName="Medium"/>
+<CellType TypeId="1" TypeName="EPI"/>
+<CellType TypeId="2" TypeName="HYB"/>
+<CellType TypeId="3" TypeName="MESEN"/>
+<CellType TypeId="4" TypeName="TCELL"/>
+<!-- <CellType TypeId="5" TypeName="SWITCHED_EPI"/> -->
+<!-- <CellType TypeId="6" TypeName="SWITCHED_HYB"/> -->
+
+
+</Plugin>
+
+
+
+
+
+
+
+
+<Plugin Name="ExternalPotential">
+
+<!-- External force applied to cell. Each cell type has different force. -->
+<!-- For more flexible specification of the constraint (done in Python) please use ExternalPotential plugin without specifying per-type parameters -->
+<!-- Algorithm options are: PixelBased, CenterOfMassBased -->
+<Algorithm>PixelBased</Algorithm>
+<!-- <ExternalPotentialParameters CellType="EPI" x="-0.5" y="0.0" z="0.0"/> -->
+<!-- <ExternalPotentialParameters CellType="HYB" x="-0.5" y="0.0" z="0.0"/> -->
+<!-- <ExternalPotentialParameters CellType="MESEN" x="-0.5" y="0.0" z="0.0"/> -->
+<!-- <ExternalPotentialParameters CellType="TCELL" x="-0.5" y="0.0" z="0.0"/> -->
+</Plugin>
+
+
+
+
+
+
+
+
+
+
+<Plugin Name="CenterOfMass">
+
+<!-- Module tracking center of mass of each cell -->
+</Plugin>
+
+
+
+
+
+
+
+
+<Plugin Name="ImplicitMotility">
+<!-- <Motility Type="Medium">10.0</Motility> --> 
+
+
+<!-- <Motility Type="EPI">10.0</Motility> --> 
+
+
+<!-- <Motility Type="HYB">10.0</Motility> -->
+<!-- <Motility Type="MESEN">10.0</Motility> -->
+<Motility Type="TCELL">200.0</Motility>
+</Plugin>
+
+
+
+
+
+
+
+<Plugin Name="Volume">
+<VolumeEnergyParameters CellType="EPI" LambdaVolume="20.0" TargetVolume="30"/>
+<VolumeEnergyParameters CellType="HYB" LambdaVolume="12.0" TargetVolume="35"/>
+<VolumeEnergyParameters CellType="MESEN" LambdaVolume="20.0" TargetVolume="45"/>
+<VolumeEnergyParameters CellType="TCELL" LambdaVolume="10.0" TargetVolume="15"/>
+</Plugin>
+
+
+
+
+
+
+
+<Plugin Name="Contact">
+   <!-- Specification of adhesion energies -->
+<Energy Type1="Medium" Type2="Medium">10.0</Energy>
+<Energy Type1="Medium" Type2="EPI">5.0</Energy>
+<Energy Type1="Medium" Type2="HYB">1.0</Energy>
+<Energy Type1="Medium" Type2="MESEN">1.0</Energy>
+<Energy Type1="Medium" Type2="TCELL">50.0</Energy>
+
+<!-- EPI = outermost, cohesive epithelial layer -->
+<Energy Type1="EPI" Type2="EPI">2.0</Energy>      <!-- strong self-adhesion -->
+<Energy Type1="EPI" Type2="HYB">10.0</Energy>       <!-- moderate boundary -->
+<Energy Type1="EPI" Type2="MESEN">10.0</Energy>    <!-- strong segregation from core -->
+<Energy Type1="EPI" Type2="TCELL">10.0</Energy>
+
+<!-- HYB = middle ring, partial adhesion both ways -->
+<Energy Type1="HYB" Type2="HYB">5.0</Energy>       <!-- moderate self-adhesion -->
+<Energy Type1="HYB" Type2="MESEN">14.0</Energy>     <!-- moderate boundary with core -->
+<Energy Type1="HYB" Type2="TCELL">10.0</Energy>
+
+<!-- MESEN = inner core, mesenchymal, loose -->
+<Energy Type1="MESEN" Type2="MESEN">8.0</Energy>   <!-- looser than EPI -->
+<Energy Type1="MESEN" Type2="TCELL">10.0</Energy>
+
+<!-- TCELL = infiltrating, moves freely -->
+<Energy Type1="TCELL" Type2="TCELL">20.0</Energy>
+
+
+   <NeighborOrder>1</NeighborOrder>
+</Plugin>
+
+
+
+
+
+
+<Plugin Name="NeighborTracker">
+
+<!-- Module tracking neighboring cells of each cell --> 
+</Plugin>
+
+
+<Plugin Name="PixelTracker">
+   
+   <!-- Module tracking pixels of each cell -->
+</Plugin>
+
+
+
+
+
+
+
+<Plugin Name="Chemotaxis">
+   
+   <!-- You may repeat ChemicalField element for each chemical field declared in the PDE solvers -->
+   <!-- Specification of chemotaxis properties of select cell types. -->
+   <ChemicalField Name="Chemokine">
+        <ChemotaxisByType Type="TCELL" Lambda="50.0"/>
+        <!-- <ChemotaxisByType Type="Sfstroma" Lambda="6.0"/> -->
+   </ChemicalField>
+</Plugin>
+
+
+
+
+
+
+
+
+
+
+
+<Plugin Name="Secretion">
+ 
+<Field Name="Chemokine"> 
+<Secretion Type="MESEN">5.0</Secretion> 
+<Secretion Type="HYB">10.0</Secretion> 
+<!-- <Secretion Type="EPI">15.0</Secretion>  -->
+<!-- &lt;!&ndash; <SecretionOnContact SecreteOnContactWith="COMMA_SEPARATED_TYPE_NAMES" Type="CELL_TYPE_NAME">1.1</SecretionOnContact> &ndash;&gt;  -->   
+<!-- &lt;!&ndash; <ConstantConcentration Type="CELL_TYPE_NAME">0.5</ConstantConcentration> &ndash;&gt;  -->   
+</Field>
+
+
+<Field Name="IFNg"> 
+<Secretion Type="TCELL">30.0</Secretion> 
+<!-- &lt;!&ndash; <SecretionOnContact SecreteOnContactWith="COMMA_SEPARATED_TYPE_NAMES" Type="CELL_TYPE_NAME">1.1</SecretionOnContact> &ndash;&gt;  -->   
+<!-- &lt;!&ndash; <ConstantConcentration Type="CELL_TYPE_NAME">0.5</ConstantConcentration> &ndash;&gt;  -->   
+</Field>
+
+<Field Name="TGFb"> 
+<!-- <Secretion Type="MESEN">15.0</Secretion>  -->
+<!-- &lt;!&ndash; <SecretionOnContact SecreteOnContactWith="COMMA_SEPARATED_TYPE_NAMES" Type="CELL_TYPE_NAME">1.1</SecretionOnContact> &ndash;&gt;  -->   
+<!-- &lt;!&ndash; <ConstantConcentration Type="CELL_TYPE_NAME">0.5</ConstantConcentration> &ndash;&gt;  -->   
+</Field>  
+
+</Plugin>       
+
+
+
+
+
+
+
+
+
+
+
+<Steppable Type="DiffusionSolverFE">
+
+<!-- Specification of PDE solvers --> 
+
+
+<DiffusionField Name="IFNg">
+<DiffusionData>
+<FieldName>IFNg</FieldName>
+<GlobalDiffusionConstant>10.0</GlobalDiffusionConstant>
+<GlobalDecayConstant>0.01</GlobalDecayConstant>
+<!-- <Additional options are:>  -->
+<!-- <InitialConcentrationExpression>x*y</InitialConcentrationExpression>  -->
+<!-- <ConcentrationFileName>INITIAL CONCENTRATION FIELD - typically a file with path Simulation/NAME_OF_THE_FILE.txt</ConcentrationFileName>  -->
+<!-- <DiffusionCoefficient CellType="TCELL">100.0</DiffusionCoefficient> -->
+<!-- <DecayCoefficient CellType="TCELL">0.0</DecayCoefficient> -->
+
+<DiffusionCoefficient CellType="MESEN">50.0</DiffusionCoefficient>
+<DiffusionCoefficient CellType="HYB">30.0</DiffusionCoefficient>
+<DiffusionCoefficient CellType="EPI">20.0</DiffusionCoefficient>
+</DiffusionData>
+<!-- <When secretion is defined inside DiffusionSolverFE all secretion constants are scaled automatically to account for the extra calls to the diffusion step when handling large diffusion constants>   -->
+</DiffusionField>
+
+
+
+
+<DiffusionField Name="Chemokine">
+<DiffusionData>
+<FieldName>Chemokine</FieldName>        
+<GlobalDiffusionConstant>4.0</GlobalDiffusionConstant>
+<GlobalDecayConstant>0.0</GlobalDecayConstant>
+<!-- Additional options are: --> 
+<InitialConcentrationExpression>15*(x==350)</InitialConcentrationExpression> 
+<!-- <ConcentrationFileName>INITIAL CONCENTRATION FIELD - typically a file with path Simulation/NAME_OF_THE_FILE.txt</ConcentrationFileName>  -->
+<DiffusionCoefficient CellType="MESEN">4.0</DiffusionCoefficient>
+<DiffusionCoefficient CellType="HYB">2.0</DiffusionCoefficient>
+<DiffusionCoefficient CellType="EPI">0.5</DiffusionCoefficient>
+<!-- <DecayCoefficient CellType="MESEN">0.0</DecayCoefficient> -->
+</DiffusionData>
+</DiffusionField>
+
+
+
+
+
+<DiffusionField Name="TGFb">
+<DiffusionData>
+<FieldName>TGFb</FieldName>
+<GlobalDiffusionConstant>10.0</GlobalDiffusionConstant>
+<GlobalDecayConstant>0.0</GlobalDecayConstant>
+<!-- Additional options are: --> 
+<InitialConcentrationExpression>70*(x==240)</InitialConcentrationExpression> 
+<!-- <ConcentrationFileName>INITIAL CONCENTRATION FIELD - typically a file with path Simulation/NAME_OF_THE_FILE.txt</ConcentrationFileName> --> 
+<DiffusionCoefficient CellType="MESEN">30.0</DiffusionCoefficient>
+<DiffusionCoefficient CellType="HYB">15.0</DiffusionCoefficient>
+<DiffusionCoefficient CellType="EPI">10.0</DiffusionCoefficient>
+<!-- <DecayCoefficient CellType="MESEN">0.0</DecayCoefficient> -->
+</DiffusionData>
+</DiffusionField>
+
+
+
+<DiffusionField Name="AntiPDL1">
+<DiffusionData>
+<FieldName>AntiPDL1</FieldName>
+<GlobalDiffusionConstant>0.0</GlobalDiffusionConstant>
+<GlobalDecayConstant>0.0</GlobalDecayConstant>
+<!-- Additional options are: --> 
+<!-- <InitialConcentrationExpression>50*(x==240)</InitialConcentrationExpression>  -->
+<!-- <ConcentrationFileName>INITIAL CONCENTRATION FIELD - typically a file with path Simulation/NAME_OF_THE_FILE.txt</ConcentrationFileName> --> 
+<DiffusionCoefficient CellType="MESEN">0.0</DiffusionCoefficient>
+<DiffusionCoefficient CellType="HYB">0.0</DiffusionCoefficient>
+<DiffusionCoefficient CellType="EPI">0.0</DiffusionCoefficient>
+<!-- <DecayCoefficient CellType="MESEN">0.0</DecayCoefficient> -->
+</DiffusionData>
+</DiffusionField>
+
+
+</Steppable>
+
+
+
+
+</CompuCell3D>

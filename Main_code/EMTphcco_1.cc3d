@@ -1,0 +1,5 @@
+<Simulation version="4.8.0">
+   <XMLScript Type="XMLScript">Simulation/EMTphcco_1.xml</XMLScript>
+   <PythonScript Type="PythonScript">Simulation/EMTphcco_1.py</PythonScript>
+   <Resource Type="Python">Simulation/EMTphcco_1Steppables.py</Resource>
+</Simulation>
