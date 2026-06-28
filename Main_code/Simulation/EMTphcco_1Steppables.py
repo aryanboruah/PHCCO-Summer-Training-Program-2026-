@@ -897,217 +897,217 @@ class TCELL_KILLINGSteppable(SteppableBasePy):
         
         
 
-# ANTI_PDL1_DRUG_DOSAGE = 50   
+ANTI_PDL1_DRUG_DOSAGE = 50   
 
         
-# class therapy_Steppable(SteppableBasePy):
-    # def __init__(self, frequency=1):
-        # '''
-        # constructor
-        # '''
-        # SteppableBasePy.__init__(self, frequency)
-        # # PLACE YOUR CODE BELOW THIS LINE
+class therapy_Steppable(SteppableBasePy):
+    def __init__(self, frequency=1):
+        '''
+        constructor
+        '''
+        SteppableBasePy.__init__(self, frequency)
+        # PLACE YOUR CODE BELOW THIS LINE
         
 
-    # def start(self):
-        # '''
-        # called once before first MCS
-        # '''
-        # # PLACE YOUR CODE BELOW THIS LINE
-        # for cell in self.cell_list:
+    def start(self):
+        '''
+        called once before first MCS
+        '''
+        # PLACE YOUR CODE BELOW THIS LINE
+        for cell in self.cell_list:
             
-            # cell.dict['anti_pdl1_bound'] = False
-            # cell.dict['marked_for_death'] = False
+            cell.dict['anti_pdl1_bound'] = False
+            cell.dict['marked_for_death'] = False
             
-        # self.PDL1_expression_therapy_log = open("D:/compucell/CompuCell3D-py3-64bit/Output_logs/PDL1_expression_therapy_log.csv", "w")     
+        self.PDL1_expression_therapy_log = open("D:/compucell/CompuCell3D-py3-64bit/Output_logs/PDL1_expression_therapy_log.csv", "w")     
         
-        # self.PDL1_expression_therapy_log.write("MCS,CellID,Cell_Type,PDL1_level_after_therapy\n")    
+        self.PDL1_expression_therapy_log.write("MCS,CellID,Cell_Type,PDL1_level_after_therapy\n")    
         
         
         
    
         
-        # anti_pdl1 = self.field.AntiPDL1
+        anti_pdl1 = self.field.AntiPDL1
         
-        # for x in range(self.dim.x):
-            # for y in range(self.dim.y):
+        for x in range(self.dim.x):
+            for y in range(self.dim.y):
                 
-                # anti_pdl1[x,y,0] = ANTI_PDL1_DRUG_DOSAGE
+                anti_pdl1[x,y,0] = ANTI_PDL1_DRUG_DOSAGE
                 
                 
-    # def anti_pdl1_therapy(self, mcs):
+    def anti_pdl1_therapy(self, mcs):
 
-        # anti_pdl1_on = self.shared_steppable_vars.get("ANTI_PDL1_ON", False)
-        # for cell in self.cell_list:
-            # cell.dict['marked_for_death'] = False
+        anti_pdl1_on = self.shared_steppable_vars.get("ANTI_PDL1_ON", False)
+        for cell in self.cell_list:
+            cell.dict['marked_for_death'] = False
         
-        # print(
-        # f"MCS={mcs} | anti_pdl1_on={anti_pdl1_on}"
-        # )
+        print(
+        f"MCS={mcs} | anti_pdl1_on={anti_pdl1_on}"
+        )
 
-        # # cells_to_delete = []
-        # cells_to_delete = set()
+        # cells_to_delete = []
+        cells_to_delete = set()
 
-        # for cell in self.cell_list_by_type(self.TCELL):
+        for cell in self.cell_list_by_type(self.TCELL):
 
-            # for neighbor, common_surface_area in self.get_cell_neighbor_data_list(cell):
+            for neighbor, common_surface_area in self.get_cell_neighbor_data_list(cell):
 
-                # if not neighbor:
-                    # continue
+                if not neighbor:
+                    continue
 
-                # # Mesen
+                # Mesen
 
-                # if neighbor.type == self.MESEN:
+                if neighbor.type == self.MESEN:
 
-                    # pdl1_level = neighbor.dict.get('PDL1_level', 0.0)
+                    pdl1_level = neighbor.dict.get('PDL1_level', 0.0)
 
-                    # effective_pdl1 = pdl1_level
+                    effective_pdl1 = pdl1_level
 
-                    # if anti_pdl1_on:
-                        # effective_pdl1 *= 0.2
+                    if anti_pdl1_on:
+                        effective_pdl1 *= 0.2
                         
-                        # print("effectivepdl1 :", effective_pdl1)
+                        print("effectivepdl1 :", effective_pdl1)
 
-                    # if effective_pdl1 >= PDL1_SUPPRESSION_THRESHOLD_MESEN:
+                    if effective_pdl1 >= PDL1_SUPPRESSION_THRESHOLD_MESEN:
                         
-                        # pass
+                        pass
 
-                    # else:
+                    else:
 
-                        # # cells_to_delete.append(neighbor)
-                        # # cells_to_delete.add(neighbor)
-                        # if neighbor.dict['marked_for_death']:
-                            # continue
-
-                        # neighbor.dict['marked_for_death'] = True
+                        # cells_to_delete.append(neighbor)
                         # cells_to_delete.add(neighbor)
+                        if neighbor.dict['marked_for_death']:
+                            continue
+
+                        neighbor.dict['marked_for_death'] = True
+                        cells_to_delete.add(neighbor)
                     
-                        # self.PDL1_expression_therapy_log.write(
-                        # f"{mcs},{neighbor.id},MESEN,{effective_pdl1:.2f}\n"
-                    # )
+                        self.PDL1_expression_therapy_log.write(
+                        f"{mcs},{neighbor.id},MESEN,{effective_pdl1:.2f}\n"
+                    )
 
-                        # if mcs % 50 == 0:
-                            # print(f"MCS={mcs} , " f"TCell {cell.id} ", f"KILLING MESEN {neighbor.id}")
+                        if mcs % 50 == 0:
+                            print(f"MCS={mcs} , " f"TCell {cell.id} ", f"KILLING MESEN {neighbor.id}")
                             
                         
-                # #Hybrid
+                #Hybrid
 
-                # elif neighbor.type == self.HYB:
+                elif neighbor.type == self.HYB:
 
-                    # pdl1_level = neighbor.dict.get('PDL1_level',0.0)
+                    pdl1_level = neighbor.dict.get('PDL1_level',0.0)
 
-                    # effective_pdl1 = pdl1_level
+                    effective_pdl1 = pdl1_level
 
-                    # if anti_pdl1_on:
-                        # effective_pdl1 *= 0.2
+                    if anti_pdl1_on:
+                        effective_pdl1 *= 0.2
                         
-                        # print("effectivepdl1 :", effective_pdl1)
+                        print("effectivepdl1 :", effective_pdl1)
 
-                    # if effective_pdl1 >= PDL1_SUPPRESSION_THRESHOLD_HYB:
+                    if effective_pdl1 >= PDL1_SUPPRESSION_THRESHOLD_HYB:
 
-                        # pass
+                        pass
 
-                    # else:
+                    else:
 
-                        # # cells_to_delete.append(neighbor)
-                        # if neighbor.dict['marked_for_death']:
-                            # continue
+                        # cells_to_delete.append(neighbor)
+                        if neighbor.dict['marked_for_death']:
+                            continue
 
-                        # neighbor.dict['marked_for_death'] = True
+                        neighbor.dict['marked_for_death'] = True
 
-                        # cells_to_delete.add(neighbor)
+                        cells_to_delete.add(neighbor)
                         
-                        # self.PDL1_expression_therapy_log.write(
-                        # f"{mcs},{neighbor.id},HYB,{effective_pdl1:.2f}\n"
-                    # )
+                        self.PDL1_expression_therapy_log.write(
+                        f"{mcs},{neighbor.id},HYB,{effective_pdl1:.2f}\n"
+                    )
 
-                        # if mcs % 50 == 0:
-                            # print(f"MCS={mcs} , " f"TCell {cell.id} " f"KILLING HYB {neighbor.id}")
+                        if mcs % 50 == 0:
+                            print(f"MCS={mcs} , " f"TCell {cell.id} " f"KILLING HYB {neighbor.id}")
                             
                             
-                # # Epi
+                # Epi
 
-                # elif neighbor.type == self.EPI:
+                elif neighbor.type == self.EPI:
 
-                    # pdl1_level = neighbor.dict.get(
-                        # 'PDL1_level',
-                        # 0.0
-                    # )
+                    pdl1_level = neighbor.dict.get(
+                        'PDL1_level',
+                        0.0
+                    )
 
-                    # effective_pdl1 = pdl1_level
+                    effective_pdl1 = pdl1_level
 
-                    # if anti_pdl1_on:
-                        # effective_pdl1 *= 0.2
+                    if anti_pdl1_on:
+                        effective_pdl1 *= 0.2
 
-                    # if effective_pdl1 >= PDL1_SUPPRESSION_THRESHOLD_EPI:
+                    if effective_pdl1 >= PDL1_SUPPRESSION_THRESHOLD_EPI:
 
-                        # pass
+                        pass
 
-                    # else:
+                    else:
 
-                        # # cells_to_delete.append(neighbor)
-                        # if neighbor.dict['marked_for_death']:
-                            # continue
+                        # cells_to_delete.append(neighbor)
+                        if neighbor.dict['marked_for_death']:
+                            continue
 
-                        # neighbor.dict['marked_for_death'] = True
+                        neighbor.dict['marked_for_death'] = True
 
-                        # cells_to_delete.add(neighbor)
+                        cells_to_delete.add(neighbor)
                         
-                        # self.PDL1_expression_therapy_log.write(
-                        # f"{mcs},{neighbor.id},HYB,{effective_pdl1:.2f}\n"
-                    # )
+                        self.PDL1_expression_therapy_log.write(
+                        f"{mcs},{neighbor.id},HYB,{effective_pdl1:.2f}\n"
+                    )
 
-                        # if mcs % 50 == 0:
-                            # print(f"MCS={mcs} , " f"TCell {cell.id} " f"KILLING EPI {neighbor.id}")
+                        if mcs % 50 == 0:
+                            print(f"MCS={mcs} , " f"TCell {cell.id} " f"KILLING EPI {neighbor.id}")
                             
                             
                         
                         
                         
-        # # for cell in cells_to_delete:
-            # # self.delete_cell(cell)
+        # for cell in cells_to_delete:
+            # self.delete_cell(cell)
                    
                    
-        # for dead_cell in cells_to_delete:
-            # self.delete_cell(dead_cell)
+        for dead_cell in cells_to_delete:
+            self.delete_cell(dead_cell)
             
-        # if mcs % 50 == 0:
-            # self.PDL1_expression_therapy_log.flush()        
+        if mcs % 50 == 0:
+            self.PDL1_expression_therapy_log.flush()        
                         
                 
                 
 
-    # def step(self, mcs):
+    def step(self, mcs):
         
-        # if mcs >= 450:
+        if mcs >= 450:
             
-            # self.shared_steppable_vars["ANTI_PDL1_ON"] = True
-            # self.anti_pdl1_therapy(mcs)
+            self.shared_steppable_vars["ANTI_PDL1_ON"] = True
+            self.anti_pdl1_therapy(mcs)
         
         
                 
                 
         
-        # '''
-        # called every MCS or every "frequency" MCS (depending how it was instantiated in the main Python file)
-        # '''
-        # # PLACE YOUR CODE BELOW THIS LINE
+        '''
+        called every MCS or every "frequency" MCS (depending how it was instantiated in the main Python file)
+        '''
+        # PLACE YOUR CODE BELOW THIS LINE
                 
-        # # for cell in self.cell_list:
-            # # print("CELL ID=",cell.id, " CELL TYPE=",cell.type," volume=",cell.volume)
+        # for cell in self.cell_list:
+            # print("CELL ID=",cell.id, " CELL TYPE=",cell.type," volume=",cell.volume)
 
-    # def finish(self):
-        # '''
-        # this function may be called at the end of simulation - used very infrequently though
-        # '''        
-        # # PLACE YOUR CODE BELOW THIS LINE
+    def finish(self):
+        '''
+        this function may be called at the end of simulation - used very infrequently though
+        '''        
+        # PLACE YOUR CODE BELOW THIS LINE
         
-        # return
+        return
 
-    # def on_stop(self):
-        # '''
-        # this gets called each time user stops simulation
-        # '''        
-        # # PLACE YOUR CODE BELOW THIS LINE
+    def on_stop(self):
+        '''
+        this gets called each time user stops simulation
+        '''        
+        # PLACE YOUR CODE BELOW THIS LINE
         
-        # return
+        return
